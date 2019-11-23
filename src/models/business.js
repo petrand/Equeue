@@ -1,6 +1,8 @@
+//require('./models/Store');
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const userSchema = new mongoose.Schema({
+const businessSchema = new mongoose.Schema({
     email:{
         type: String,
         unique: true,
@@ -9,9 +11,13 @@ const userSchema = new mongoose.Schema({
     password:{
         type: String,
         required: true
+    },
+    is_business:{ 
+        type: Boolean
     }
+
 });
-userSchema.pre('save', function(next){
+businessSchema.pre('save', function(next){
     const user = this;
     if (!user.isModified('password')){
         return next();
@@ -31,7 +37,7 @@ userSchema.pre('save', function(next){
 
 });
 
-userSchema.methods.comparePassword = function(candidatePassword) {
+businessSchema.methods.comparePassword = function(candidatePassword) {
     const user = this;
     return new Promise((resolve, reject) => {
         bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
@@ -46,12 +52,4 @@ userSchema.methods.comparePassword = function(candidatePassword) {
     });
 }
 
-/*userSchema.methods.enqueue = function(nfcId){
-    const queue = await Queue.find(
-        { "nfcId": nfcId },
-        function(err,docs) { 
-        } 
-    );
-}
-*/
-mongoose.model('User', userSchema);
+mongoose.model('Business', businessSchema);

@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const Business = mongoose.model('Business');
 
 module.exports = (req,res,next) => {
-    const { authorization } = req.header;
+    const { authorization, user_agent } = req.headers;
     // authorization === 'Bearer sdgsfgsfdh'
     if (!authorization) {
         return res.status(401).send({error: 'U must log in.'});
@@ -13,9 +14,16 @@ module.exports = (req,res,next) => {
         if (err) {
             return res.status(401).send({error: 'You must be logged in.'})
         }
-        const {userId} = payload;
-        const user = await User.findById(userId);
-        req.user = user;
-        next(); 
+        if (user_agent=='Business'){
+            const {businessId} = payload;
+            const business = await Business.findById(businessId);
+            req.business = business;
+            next(); 
+        }else{
+            const {userId} = payload;
+            const user = await User.findById(userId);
+            req.user = user;
+            next(); 
+        }
     });
 };
